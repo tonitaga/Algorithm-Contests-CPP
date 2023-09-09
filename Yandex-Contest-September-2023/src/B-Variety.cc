@@ -12,16 +12,22 @@ int main() {
             std::cin >> item;
             A[item]++;
         }
-
         variety = static_cast<int>(A.size());
 
         for (int i = 0; i != M; ++i) {
             std::cin >> item;
+
+            int was = std::abs(A[item] - B[item]);
             B[item]++;
 
             int left = std::abs(A[item] - B[item]);
-            if (left != 0) variety += left;
-            else variety--;
+
+            if (was > left) {
+                variety--;
+            } else {
+                if (left != 0) variety++;
+                else variety--;
+            }
         }
     }
 

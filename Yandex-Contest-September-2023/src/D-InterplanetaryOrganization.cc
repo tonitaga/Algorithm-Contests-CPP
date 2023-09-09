@@ -1,165 +1,51 @@
+//
+//  Time-limit-exceeded on last test when 'n' is 1kk
+//
+
 #include <bits/stdc++.h>
 
-std::unordered_map<int, std::vector<int>> BFS_document(const std::vector<int> &document) {
-    std::unordered_map<int, std::vector<int>> map;
-    std::queue<std::vector<int>> q;
-
+std::vector<int> DFS_document(const std::vector<int> &document, const std::vector<char> &languages, int n) {
     if (document.size() == 2)
         return {};
 
-    int start, saved;
-    for (std::size_t i = 1; i != document.size() - 1; ++i) {
-        saved = document[i], start = i;
-        while (document[++i] != saved);
-        q.emplace(document.begin() + start, document.begin() + 1 + i);
-        map[0].push_back(q.back()[0]);
-    }
-
-    int current_id;
-    while (!q.empty()) {
-        auto sub_arr = q.front();
-        q.pop();
-        current_id = sub_arr[0];
-
-        map[current_id];
-
-        if (sub_arr.size() == 2)
-            continue;
-
-        for (std::size_t i = 1; i != sub_arr.size() - 1; ++i) {
-            saved = sub_arr[i], start = i;
-            while (sub_arr[++i] != saved);
-            q.emplace(sub_arr.begin() + start, sub_arr.begin() + 1 + i);
-            map[current_id].push_back(q.back()[0]);
-        }
-    }
-
-    return map;
-}
-
-//std::vector<int> DFS_hierarchy(std::unordered_map<int, std::vector<int>> &hierarchy, const std::vector<char> &lang, int n) {
-//    if (n == 0)
-//        return {};
-//
-//    std::stack<int> s;
-//    s.push(0);
-//
-//    std::vector<bool> visited(n + 1, false);
-//    visited[0] = true;
-//
-//    int left_id = hierarchy[0].front(), right_id = hierarchy[0].back();
-//    int distance_to_a = 0, distance_to_b = 0;
-//    int saved_distance_b = 0, saved_distance_a = 0;
-//    bool a_was_incremented = false, b_was_incremented = false;
-//
-//    std::vector<int> distances(n, -1);
-//
-//    while (!s.empty()) {
-//        auto from = s.top();
-//
-//        if (from == left_id or from == right_id)
-//            distance_to_b = distance_to_a = 0;
-//
-//        bool is_found = false;
-//
-//
-//        for (auto sub_item : hierarchy[from]) {
-//            if (visited[sub_item])
-//                continue;
-//
-//            is_found = true;
-//            s.push(sub_item);
-//            visited[sub_item] = true;
-//
-//            if (from == 0) {
-//                distances[sub_item - 1] = 0;
-//            } else if (lang[sub_item - 1] != lang[from - 1]) {
-//                if (lang[sub_item - 1] == 'A') {
-//                    distance_to_a++;
-//                    saved_distance_a = distance_to_a;
-//                    a_was_incremented = true;
-//                    distances[sub_item - 1] = distance_to_a;
-//                    distance_to_a = 0;
-//                } else {
-//                    distance_to_b++;
-//                    saved_distance_b = distance_to_b;
-//                    b_was_incremented = true;
-//                    distances[sub_item - 1] = distance_to_b;
-//                    distance_to_b = 0;
-//                }
-//            } else {
-//                if (lang[sub_item - 1] == 'A') {
-//                    b_was_incremented = true;
-//                    distance_to_b++;
-//                    saved_distance_b = distance_to_b;
-//                    distance_to_a = 0;
-//                } else {
-//                    a_was_incremented = true;
-//                    distance_to_a++;
-//                    saved_distance_a = distance_to_a;
-//                    distance_to_b = 0;
-//                }
-//                distances[sub_item - 1] = 0;
-//            }
-//
-//            break;
-//        }
-//
-//        if (!is_found) {
-//            s.pop();
-//
-//
-//            if (b_was_incremented) {
-//                saved_distance_b--;
-//                distance_to_b = saved_distance_b;
-//            }
-//            if (a_was_incremented) {
-//                saved_distance_a--;
-//                distance_to_a = saved_distance_a;
-//            }
-//
-//            a_was_incremented = false, b_was_incremented = false;
-//        }
-//    }
-//
-//    return distances;
-//}
-
-std::vector<int> DFS_hierarchy(std::unordered_map<int, std::vector<int>> &hierarchy, const std::vector<char> &languages, int n) {
-    std::vector<char> order;
-    order.reserve(hierarchy.size() * 2);
-    order.push_back('\0'); // '\0' means that is start (head) of hierarchy
-
-    std::stack<int> s;
-    s.push(0); // starting from head of hierarchy
-
+    std::stack<std::pair<int, int>> s;
+    std::vector<int> distances(n, -1);
     std::vector<bool> visited(n + 1, false);
-    visited[0] = true; // at start head is visited;
+    std::vector<std::pair<int, int>> order;
+    order.reserve(n);
+    visited[0] = true;
 
-    std::vector<int> distances(n, -1); // array of distances
+    s.emplace(0, document.size());
 
+    int start, saved;
     while (!s.empty()) {
-        int from = s.top();
+        auto borders = s.top();
 
         bool is_found = false;
-        for (auto sub_item : hierarchy[from]) {
-            if (visited[sub_item])
+
+        for (int i = borders.first; i != borders.second; ++i) {
+            if (visited[document[i]])
                 continue;
 
-            is_found = true;
-            s.push(sub_item);
-            visited[sub_item] = true;
-            order.push_back(languages[sub_item - 1]);
+            saved = document[i], start = i;
+            while (document[++i] != saved);
 
-            int distance = 0;
-            for (auto it = order.rbegin() + 1; it != order.rend(); ++it) {
-                if (languages[sub_item - 1] != *it) distance++;
-                else break;
+            s.emplace(start, i);
+            visited[saved] = is_found = true;
 
-                if (*it == '\0') distance--;
+            if (document[borders.first] == 0) {
+                order.emplace_back(0, 0);
+                distances[saved - 1] = 0;
+                break;
             }
 
-            distances[sub_item - 1] = distance;
+            if (languages[document[borders.first] - 1] == 'B') {
+                order.emplace_back(order.back().first + 1, 0);
+            } else {
+                order.emplace_back(0, order.back().second + 1);
+            }
+
+            distances[saved - 1] = languages[saved - 1] == 'A' ? order.back().first : order.back().second;
             break;
         }
 
@@ -184,8 +70,7 @@ int main() {
     for (auto &item : document)
         std::cin >> item;
 
-    auto hierarchy = BFS_document(document);
-    auto distances = DFS_hierarchy(hierarchy, languages, n);
+    auto distances = DFS_document(document, languages, n);
 
     for (auto item : distances)
         std::cout << item << ' ';
@@ -193,6 +78,8 @@ int main() {
 
     return EXIT_SUCCESS;
 }
+
+
 
 /*
 1)

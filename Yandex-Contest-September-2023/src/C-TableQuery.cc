@@ -11,9 +11,16 @@ int main() {
         std::cin >> name;
 
     Matrix matrix(N, std::vector<int>(M, 0));
-    for (auto &row : matrix)
-        for (auto &row_item : row)
+    std::vector<int> rows_sum;
+    rows_sum.reserve(N);
+
+    int total_sum = 0;
+    for (auto &row : matrix) {
+        for (auto &row_item: row)
             std::cin >> row_item;
+        rows_sum.push_back(std::accumulate(row.begin(), row.end(), 0));
+        total_sum += rows_sum.back();
+    }
 
     std::vector<bool> is_closed(N, false);
 
@@ -27,31 +34,31 @@ int main() {
 
         if (op == '<') {
             for (int row = 0; row != N; ++row) {
-                if (matrix[row][column_index] >= value)
+                if (is_closed[row])
+                    continue;
+                if (matrix[row][column_index] >= value) {
                     is_closed[row] = true;
+                    total_sum -= rows_sum[row];
+                }
             }
         } else {
             for (int row = 0; row != N; ++row) {
-                if (matrix[row][column_index] <= value)
+                if (is_closed[row])
+                    continue;
+                if (matrix[row][column_index] <= value) {
                     is_closed[row] = true;
+                    total_sum -= rows_sum[row];
+                }
             }
         }
 
-        if (std::all_of(is_closed.begin(), is_closed.end(), [](auto item) {
-            return item == true;
-        })) {
-            std::cout << 0 << std::endl;
+        if (total_sum == 0) {
+            std::cout << total_sum << '\n';
             return 0;
         }
     }
 
-    int sum = 0;
-    for (int row = 0; row != N; ++row) {
-        if (!is_closed[row])
-            sum += std::accumulate(matrix[row].begin(), matrix[row].end(), 0);
-    }
-
-    std::cout << sum << std::endl;
+    std::cout << total_sum << std::endl;
 
     return EXIT_SUCCESS;
 }
