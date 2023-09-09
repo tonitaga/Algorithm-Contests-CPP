@@ -53,15 +53,8 @@ std::size_t BFS(const AdjacencyList<std::size_t> &adjacency_list, std::size_t ex
 }
 
 int main() {
-    std::ifstream fin("datasets/test_5.txt");
-    if (!fin.is_open()){
-        std::cout << "Error" << std::endl;
-        return -1;
-    }
-
-    std::cout << "File is opem" << std::endl;
     std::size_t vertexes_count, edges_count;
-    fin >> vertexes_count >> edges_count;
+    std::cin >> vertexes_count >> edges_count;
 
     AdjacencyList<std::size_t> adjacency_list(vertexes_count, std::vector<List>());
 
@@ -69,7 +62,7 @@ int main() {
     {
         std::size_t u, v, w;
         for (std::size_t i = 0; i != edges_count; ++i) {
-            fin >> u >> v >> w;
+            std::cin >> u >> v >> w;
 
             max_weight = std::max(w, max_weight);
             adjacency_list[u - 1].push_back({v - 1, w});
@@ -77,25 +70,11 @@ int main() {
         }
     }
 
-    std::cout << "Adjacency list initialized" << std::endl;
-
     for (std::size_t weight = max_weight; weight != 0; --weight) {
         if (BFS(adjacency_list, weight) == BFS(adjacency_list, max_weight, false)) {
             std::cout << weight << std::endl;
             return EXIT_SUCCESS;
         }
-//        bool is_need_continue = false;
-//        for (std::size_t v = 0; v != vertexes_count; ++v) {
-//            if (BFS(adjacency_list, v, weight).size() != BFS(adjacency_list, v, max_weight, false).size()) {
-//                is_need_continue = true;
-//                break;
-//            }
-//        }
-
-//        if (!is_need_continue) {
-//            std::cout << weight << std::endl;
-//            return EXIT_SUCCESS;
-//        }
     }
 
     std::cout << 0 << std::endl;
