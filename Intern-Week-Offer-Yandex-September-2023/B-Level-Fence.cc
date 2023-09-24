@@ -1,18 +1,20 @@
 #include <bits/stdc++.h>
 
+using uint64 = unsigned long long;
+
 void Solution() {
     std::ifstream fin("input.txt");
     std::ofstream fout("output.txt");
-    unsigned n, k;
+    uint64 n, k;
     fin >> n >> k;
 
-    std::vector<unsigned> heights(n);
+    std::vector<uint64> heights(n);
 
     for (auto &item : heights)
         fin >> item;
 
     std::sort(heights.begin(), heights.end());
-    unsigned min_difference = std::numeric_limits<unsigned>::max();
+    uint64 min_difference = std::numeric_limits<uint64>::max();
 
     std::ptrdiff_t left = k, right = 0;
     while (left >= 0) {
